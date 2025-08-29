@@ -1,0 +1,14 @@
+
+robot = SpikePrimeDriver()
+
+# Drive forward 50 cm
+robot.drive_straight(50)
+
+# Turn 90 degrees right
+robot.turn_by_angle(90)
+
+# Drive backward 30 cm
+robot.drive_straight(30, reverse=True)
+
+# Drive forward 100 cm with obstacle detection
+robot.drive_straight(100, stop_distance_cm=15)
