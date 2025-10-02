@@ -1,7 +1,6 @@
 from hub import light_matrix, port, motion_sensor
 from motor import relative_position
 import motor
-import urllib.request
 import runloop, motor_pair
 import time
 import math
