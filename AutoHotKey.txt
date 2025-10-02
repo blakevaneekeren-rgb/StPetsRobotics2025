@@ -3,7 +3,7 @@
 ; SETTINGS — EDIT THESE
 ; =========================
 
-remotePyURL := "https://raw.githubusercontent.com/blakevaneekeren-rgb/StPetsRobotics2025/refs/heads/main/API-Main2"
+remotePyURL := "https://raw.githubusercontent.com/blakevaneekeren-rgb/StPetsRobotics2025/refs/heads/main/API-Main"
 DELIM := "############DO NOT TOUCH ABOVE THIS LINE############"
 
 ; SPIKE main window title (adjust if needed)
