@@ -10,8 +10,8 @@ DELIM := "############DO NOT TOUCH ABOVE THIS LINE############"
 spikeTitle := "LEGO Education SPIKE - 3.5.1"
 
 ; Where to click inside the SPIKE window to focus the code editor (relative offset from window top-left)
-editorClickOffsetX := 300
-editorClickOffsetY := 500
+editorClickOffsetX := 2000
+editorClickOffsetY := 250
 
 ; Timing (ms) — bump up if your machine is slow
 t_launch := 20000
@@ -69,10 +69,14 @@ ClipSaved := A_Clipboard
 A_Clipboard := DELIM
 Sleep 100
 
+MsgBox "Clipboard" A_Clipboard
+
 Send "^f"
 Sleep t_ui
+Send DELIM
+Sleep t_ui
 Send "^v"
-Sleep 100
+Sleep t_ui
 Send "{Enter}"
 Sleep t_find
 Send "{Esc}"
