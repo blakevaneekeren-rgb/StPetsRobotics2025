@@ -1,0 +1,107 @@
+
+; =========================
+; SETTINGS — EDIT THESE
+; =========================
+
+remotePyURL := "https://raw.githubusercontent.com/blakevaneekeren-rgb/StPetsRobotics2025/refs/heads/main/API-Main2"
+DELIM := "############DO NOT TOUCH ABOVE THIS LINE############"
+
+; SPIKE main window title (adjust if needed)
+spikeTitle := "LEGO Education SPIKE - 3.5.1"
+
+; Where to click inside the SPIKE window to focus the code editor (relative offset from window top-left)
+editorClickOffsetX := 300
+editorClickOffsetY := 500
+
+; Timing (ms) — bump up if your machine is slow
+t_launch := 20000
+t_ui := 400
+t_find := 600
+
+; =========================
+; SCRIPT
+; =========================
+
+
+
+; 1) Download remote code
+tmpFile := A_Temp "\spike_patch_" A_Now ".py"
+try {
+Download(remotePyURL, tmpFile)
+
+} catch as e {
+MsgBox "❌ Download failed:`n" e.Message
+ExitApp
+}
+if !FileExist(tmpFile) {
+MsgBox "❌ Remote file not saved."
+ExitApp
+}
+remoteCode := FileRead(tmpFile, "UTF-8")
+;MsgBox "New Code" remoteCode
+
+; Ensure trailing newline so the line after paste starts cleanly
+if !RegExMatch(remoteCode, "\R$") {
+remoteCode .= "`r`n"
+}
+
+
+
+; 3) Wait for SPIKE window and activate it
+if !WinWait(spikeTitle, , t_launch) {
+MsgBox "❌ Couldn't find SPIKE window. Check file association/window title."
+ExitApp
+}
+WinActivate
+Sleep t_ui
+Sleep 500
+
+
+; 4) Click inside editor to ensure focus
+WinGetPos &wx, &wy, &ww, &wh, spikeTitle
+MouseMove wx + editorClickOffsetX, wy + editorClickOffsetY, 0
+Click
+Sleep t_ui
+
+; 5) Find delimiter line
+; Put delimiter on clipboard, open Find, paste, Enter to jump, ESC to close find box
+ClipSaved := A_Clipboard
+A_Clipboard := DELIM
+Sleep 100
+
+Send "^f"
+Sleep t_ui
+Send "^v"
+Sleep 100
+Send "{Enter}"
+Sleep t_find
+Send "{Esc}"
+Sleep t_ui
+
+; 6) Move to the START of the delimiter line
+Send "{Home}"
+Sleep 150
+;MsgBox "Found delimter line"
+
+; 7) Select from top of file down to (but not including) the delimiter line
+Send "+^{Home}" ; Shift+Ctrl+Home selects from current position to start of file
+Sleep 150
+
+; 8) Paste the downloaded code to replace the selection
+A_Clipboard := remoteCode
+Sleep 100
+Send "^v"
+Sleep t_ui
+
+; 9) Save
+Send "^s"
+Sleep 300
+
+; 10) Restore clipboard
+A_Clipboard := ClipSaved
+
+; Done
+
+MsgBox "Downloaded and saved new API"
+
+ExitApp
