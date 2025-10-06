@@ -69,7 +69,7 @@ ClipSaved := A_Clipboard
 A_Clipboard := DELIM
 Sleep 100
 
-MsgBox "Clipboard" A_Clipboard
+;MsgBox "Clipboard" A_Clipboard
 
 Send "^f"
 Sleep t_ui
