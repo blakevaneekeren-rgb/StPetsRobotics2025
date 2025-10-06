@@ -6,7 +6,7 @@ import time
 import math
 import os
 
-# 10/06 3:22
+# 10/06 4:28
 
 
 log_level= 0
@@ -87,7 +87,7 @@ def drive_attachment_motor(degrees, speed, move_type):
     motor.reset_relative_position(port.E,0)
     motor.reset_relative_position(port.B,0)
 
-    rotation_count = 0
+    relative_position = 0
 
     if move_type == "LEFT":
         motor.run_for_degrees(port.E, degrees, speed)
@@ -98,9 +98,10 @@ def drive_attachment_motor(degrees, speed, move_type):
     elif move_type == "BOTH":
         motor_pair.move_tank(motor_pair.PAIR_2, speed, speed)
 
-        while motor.relative_position(port.B) < degrees:        
+        while abs(relative_position) < degrees:
+            relative_position = motor.relative_position(port.B)
             if( log_level >= 7 ) :
-                print("current",abs(rotation_count),"out of needed",degrees, "at the speed of", speed)
+                print("current",abs(relative_position),"out of needed",degrees, "at the speed of", speed)
         motor_pair.stop(motor_pair.PAIR_2)
     #if log_level >= 1:
         #print("Reached the destination, ending drive_straight(", distance_cm, ",", speed, ",", reverse, ",", correction_factor, ",", acceleration,")")
@@ -112,7 +113,7 @@ def log_waypoints():
     global counter
     print("Finished waypoint", counter)
     print("____")
-    counter = counter + 1 
+    counter = counter + 1
 
 def drive_forward(distance_cm,speed):
     drive_straight(distance_cm, speed, False, default_correction_factor)
@@ -125,20 +126,36 @@ def turn_left(target_angle, speed):
 def turn_right(target_angle, speed):
     turn_by_angle(target_angle, speed)
 
-def move_right_attachment_up(rotations, speed):
-    drive_attachment_motor(rotations, speed, "RIGHT")
+def move_right_attachment_up(degrees, speed):
+    drive_attachment_motor(degrees, speed, "RIGHT")
 
-def move_right_attachment_down(rotations, speed):
-    drive_attachment_motor(rotations, -1 * speed, "RIGHT")
+def move_right_attachment_down(degrees, speed):
+    drive_attachment_motor(degrees, -1 * speed, "RIGHT")
 
-def move_left_attachment_up(rotations, speed):
-    drive_attachment_motor(rotations, -1 * speed, "LEFT")
+def move_left_attachment_up(degrees, speed):
+    drive_attachment_motor(degrees, -1 * speed, "LEFT")
 
-def move_left_attachment_down(rotations, speed):
-    drive_attachment_motor(rotations, speed, "LEFT")
+def move_left_attachment_down(degrees, speed):
+    drive_attachment_motor(degrees, speed, "LEFT")
 
-def move_both_attachment_down(rotations, speed):
-    drive_attachment_motor(rotations, speed, "BOTH")
+def move_both_attachment_down(degrees, speed):
+    drive_attachment_motor(degrees, speed, "BOTH")
 
-def move_both_attachment_up(rotations, speed):
-    drive_attachment_motor(rotations, -1 * speed, "BOTH")
+def move_both_attachment_up(degrees, speed):
+    drive_attachment_motor(degrees, -1 * speed, "BOTH")
+
+
+'''EXAMPLE CODE'''
+
+def run_mission_x():
+    drive_forward(100, 500) #Drive 100 centimeters forward at speed 500 (base_speed) 
+    drive_backwards(100, base_speed) #Drive back to the start (100 centimeters backwards) at base_speed
+    turn_left(90, base_speed) #Turn left 90 Degrees (Right Angle) at base_speed
+    turn_right(90, base_speed) #Turn right at a right angle at base_speed
+    move_right_attachment_up(50, base_speed) #move right attachment up 50 degrees at base_speed
+    move_right_attachment_down(50, base_speed) #move right attachment down 50 degrees at base_speed
+    move_left_attachment_up(50, base_speed) #move left attachment up 50 degrees at base_speed
+    move_left_attachment_down(50, base_speed) #move left attachment down 50 degrees at base_speed
+    move_both_attachment_up(50, base_speed) #move both attachments up 50 degrees at base_speed
+    move_both_attachment_down(50, base_speed) #move both attachments down 50 degrees at base_speed
+    time.sleep(1) #Make robot rest for 1 second
