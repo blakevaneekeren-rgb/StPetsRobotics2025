@@ -1,5 +1,7 @@
-from hub import light_matrix, port, motion_sensor
+from hub import light_matrix, port, motion_sensor, sound
 from motor import relative_position
+import color
+import color_sensor
 import motor
 import runloop, motor_pair
 import time
@@ -108,17 +110,66 @@ def drive_attachment_motor(degrees, speed, move_type):
     time.sleep(.5)
     log_waypoints()
 
-
+def check_color(color_needed):
+    while True:
+        if color_needed == -1:
+            color_name = "no object"
+        elif color_needed == 0:
+            color_name = "black"
+        elif color_needed == 1:
+            color_name = "magenta"
+        elif color_needed == 3:
+            color_name = "blue"
+        elif color_needed == 4:
+            color_name = "turquoise"
+        elif color_needed == 5:
+            color_name = "green"
+        elif color_needed == 7:
+            color_name = "yellow"
+        elif color_needed == 9:
+            color_name = "red"
+        elif color_needed == 10:
+            color_name = "white"
+        else:
+            color_name = "[CHECK CODE WITH API TEAM] color name has not been found, but it"
+        
+        if color_sensor.color(port.A) == color_needed:
+            print(color_name, "has been reached")
+            
+        else:
+            print("color not yet found")
+    
 
 def drive_forward(distance_cm,speed):
     drive_straight(distance_cm, speed, False, default_correction_factor)
     if log_level >= 1:
         print("Reached the destination, ending drive_forward(", distance_cm, ",", speed, ")")
 
+def drive_forward_until_color(speed, color_needed):
+
+        while color_sensor.color(port.A) != color_needed:
+                motor_pair.move_tank(motor_pair.PAIR_1, 200, 200)
+                print(color_sensor.color(port.A))
+        
+        motor_pair.stop(motor_pair.PAIR_1)
+        if log_level >= 1:
+            print("Reached the destination, ending drive_forward_until_color(", speed, ",", color_needed, ")")
+                    
+
 def drive_backwards(distance_cm,speed):
     drive_straight(distance_cm, speed, True, default_correction_factor)
     if log_level >= 1:
         print("Reached the destination, ending drive_backwards(", distance_cm, ",", speed, ")")
+
+""" WIP DO NOT USE - def drive_backwards_until_color(speed, color_needed):
+
+        while color_sensor.color(port.A) != color_needed:
+                motor_pair.move_tank(motor_pair.PAIR_1, -200, -200)
+                print(color_sensor.color(port.A))
+
+        motor_pair.stop(motor_pair.PAIR_1)
+        if log_level >= 1:
+            print("Reached the destination, ending drive_backwards_until_color(", speed, ",", color_needed, ")")"""
 
 def turn_left(target_angle, speed):
     turn_by_angle(-1 * target_angle, speed)
@@ -168,3 +219,19 @@ def log_waypoints():
     counter = counter + 1
 
 log_level=1
+
+####USE BELOW FOR TEMPLATE####
+
+def run_mission_x(): 
+    drive_forward(100, 500) #Drive 100 centimeters forward at speed 500 (base_speed)
+    drive_forward_until_color(base_speed, color.BLACK) #Drive at base_speed until it sees the color black
+    drive_backwards(100, base_speed) #Drive back to the start (100 centimeters backwards) at base_speed
+    turn_left(90, base_speed) #Turn left 90 Degrees (Right Angle) at base_speed
+    turn_right(90, base_speed) #Turn right at a right angle at base_speed
+    move_right_attachment_up(50, base_speed) #move right attachment up 50 degrees at base_speed
+    move_right_attachment_down(50, base_speed) #move right attachment down 50 degrees at base_speed
+    move_left_attachment_up(50, base_speed) #move left attachment up 50 degrees at base_speed
+    move_left_attachment_down(50, base_speed) #move left attachment down 50 degrees at base_speed
+    move_both_attachment_up(50, base_speed) #move both attachments up 50 degrees at base_speed
+    move_both_attachment_down(50, base_speed) #move both attachments down 50 degrees at base_speed
+    time.sleep(1) #Make robot rest for 1 second
